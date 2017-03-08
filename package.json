@@ -1,0 +1,23 @@
+{
+  "name": "Indra_CRUD",
+  "version": "1.0.0",
+  "main": "main.js",
+  "scripts": {
+    "start": "electron .",
+    "package-all": "electron-packager ./ Indra_CRUD --all --out builds --version 1.0.0 --overwrite --asar=true",
+    "package": "electron-packager ./ Indra_CRUD --out builds --version 1.0.0 --overwrite --asar=true"
+  },
+  "repository": "https://bitbucket.org/sinayra/jmcarros",
+  "author": "Sinayra Pascoal Cotts Moreira",
+  "devDependencies": {
+    "browser-resolve": "^1.11.2",
+    "buffer": "^5.0.5",
+    "detective": "^4.3.2",
+    "electron": "^1.4.1",
+    "electron-packager": "^8.4.0",
+    "process": "^0.11.9",
+    "fs" : "^1.0.0",
+    "ejs": "^1.0.0",
+    "datatables.net": "^2.1.1"
+  }
+}
