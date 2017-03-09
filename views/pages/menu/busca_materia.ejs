@@ -1,0 +1,33 @@
+
+<%
+    if(materia == 0){
+        %>
+        Nenhuma turma cadastrada
+        <%
+    }
+    else{
+%>
+<table class="info">
+    <thead>
+        <tr>
+            <th>Turma</td>
+            <th>Professor</td>
+            <th>Restrição</td>
+        </tr>
+    </thead>
+    <tbody>
+        <%
+            for (var i = 0; i < materia.length; i++) {
+                %>
+                
+                <tr>
+                    <td><%=materia[i][0]%></td>
+                    <td><%=materia[i][2]%></td>
+                    <td><%=materia[i][1]%></td>
+                </tr>
+                <%
+            }
+        %>
+    </tbody>
+</table>
+<% } %>

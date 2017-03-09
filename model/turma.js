@@ -1,4 +1,5 @@
 var db;
+const utils = require('../public/js/utils.js');
 
 var self = module.exports = {
 
@@ -9,7 +10,7 @@ var self = module.exports = {
 	insere : function(turma){
 		var sqlstr;
 		
-		sqlstr = 'INSERT INTO turma (nome, id_materia) VALUES ("' + turma.nome + '", ' + turma.id_materia + ') ;';
+		sqlstr = 'INSERT INTO turma (nome, id_materia, restricao) VALUES ("' + turma.nome + '", ' + turma.id_materia + ', "' + turma.restricao + '") ;';
 		db.run(sqlstr);
 	},
 
@@ -17,7 +18,7 @@ var self = module.exports = {
 		var sqlstr;
 
 
-		sqlstr = db.prepare('UPDATE turma SET nome = "'+ turma.nome + '", id_materia = "'+ turma.id_materia+ '" WHERE id=:aval');
+		sqlstr = db.prepare('UPDATE turma SET nome = "'+ turma.nome + '", id_materia = '+ turma.id_materia+ ', restricao = "'+ turma.restricao + '" WHERE id=:aval');
 		sqlstr.getAsObject({':aval' : turma.id});
 	},
 
@@ -28,5 +29,27 @@ var self = module.exports = {
 		sqlstr.getAsObject({':aval' : id});
 
 		db.run(sqlstr);
+	},
+
+	buscaNomeTurmas : function(id_materia){
+		var t = db.exec('SELECT id, nome FROM turma WHERE id_materia =' + id_materia + ' ORDER BY nome ASC');
+		var val = [];
+
+		t.forEach(function(item){
+			val.push(item.values);
+		});
+
+		return (!utils.isEmpty(val[0]) ? val[0] : 0);
+	},
+
+	selectTurmas : function(){
+		var t = db.exec('SELECT t.id, t.nome AS "turma_nome", m.nome AS "materia_nome", t.restricao, m.id FROM turma AS t LEFT JOIN materia AS m ON t.id_materia = m.id ORDER BY materia_nome, turma_nome ASC');
+		var val = [];
+
+		t.forEach(function(item){
+			val.push(item.values);
+		});
+
+		return (!utils.isEmpty(val[0]) ? val[0] : 0);
 	}
 };

@@ -40,3 +40,7 @@ String.prototype.parseDate = function () {
   // new Date(year, month [, day [, hours[, minutes[, seconds[, ms]]]]])
   return new Date(parts[2], parts[1] - 1, parts[0]);
 }
+
+String.prototype.capitalizeFirstLetter = function () {
+    return this.charAt(0).toUpperCase() + this.slice(1);
+}

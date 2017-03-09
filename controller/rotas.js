@@ -19,8 +19,8 @@ var self = module.exports = {
 		self.geral(db);
 		self.materia(db);
 		self.turma(db);
-/*		self.professor(db);
-*/
+		self.professor(db);
+		self.turmaprof(db);
 	},
 
 	geral : function(db){
@@ -28,15 +28,48 @@ var self = module.exports = {
 			res.render("pages/index");
 		});
 
+		view.get('/menu/inicio', function (req, res) {
+			res.render("pages/menu/inicio");
+		});
 
 		view.get('/menu/cadastro', function (req, res) {
+			var materia = db.selectTudo("materia", "nome");
+			var id_materia;
+
+			if(materia == 0){
+				id_materia = 0;
+			}
+			else{
+				id_materia = materia[0][0];
+			}
+
 			var parametros = {
 				professor : db.selectTudo("professor", "nome"),
-				turma : db.selectTudo("turma", "nome"),
-				materia: db.selectTudo("materia", "nome")
+				turma : db.turma.buscaNomeTurmas(id_materia),
+				materia: materia
 			};
 
 			res.render("pages/menu/cadastro", parametros);
+		});
+
+		view.get('/menu/ler', function (req, res) {
+
+			var parametros = {
+				materia: db.selectTudo("materia", "nome")
+			};
+
+			res.render("pages/menu/ler", parametros);
+		});
+
+		view.get('/menu/atualizar', function (req, res) {
+
+			var parametros = {
+				materia: db.selectTudo("materia", "nome"),
+				turma: db.turma.selectTurmas(),
+				professor: db.selectTudo("professor", "nome")
+			};
+
+			res.render("pages/menu/atualizar", parametros);
 		});
 	},
 
@@ -46,12 +79,61 @@ var self = module.exports = {
 			db.materia.insere(req.body.params);
 			res.sendStatus(200);
 		});
+
+		view.post('/menu/atualiza/materia', function (req, res) {
+
+			db.materia.update(req.body.params);
+			res.sendStatus(200);
+		});
+
+		view.post('/menu/ler/busca_materia', function (req, res) {
+
+			var parametros = {
+				materia: db.materia.buscaMateriaInfo(req.body.id)
+			};
+
+			res.render("pages/menu/busca_materia", parametros);
+		});
 	},
 
 	turma : function(db){
 		view.post('/menu/cadastro/turma', function (req, res) {
 
 			db.turma.insere(req.body.params);
+			res.sendStatus(200);
+		});
+
+		view.post('/menu/atualiza/turma', function (req, res) {
+
+			db.turma.update(req.body.params);
+			res.sendStatus(200);
+		});
+
+		view.post('/menu/busca/turma', function (req, res) {
+
+			var turma = db.turma.buscaNomeTurmas(req.body.params);
+			res.json(turma);
+		});
+	},
+
+	professor : function(db){
+		view.post('/menu/cadastro/professor', function (req, res) {
+
+			db.professor.insere(req.body.params);
+			res.sendStatus(200);
+		});
+
+		view.post('/menu/atualiza/professor', function (req, res) {
+
+			db.professor.update(req.body.params);
+			res.sendStatus(200);
+		});
+	},
+
+	turmaprof : function(db){
+		view.post('/menu/cadastro/turmaprof', function (req, res) {
+
+			db.turmaprof.insere(req.body.params);
 			res.sendStatus(200);
 		});
 	}

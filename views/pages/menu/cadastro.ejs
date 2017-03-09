@@ -1,12 +1,23 @@
-<h2>Cadastrar professor</h2>
-<form id="frm_cadastro_professor" class="ccform">
+<h2>Alocar professor</h2>
+
+<form id="frm_cadastro_turmaprof" class="ccform">
+
 	<div class="ccfield-prepend">
-		<input class="ccformfield" type="text" name="nome" placeholder="Nome do professor" >
+		<select name="id_professor" class="ccformfield" >
+		<option value="" disabled selected hidden>Escolha o professor</option>
+      		<%
+				for (var i = 0; i < professor.length; i++){%>
+					<option value="<%=professor[i][0]%>"><%=professor[i][1]%></option>
+				<%}
+			%>
+      	</select>
 	</div>
+
 	<div class="ccfield-prepend">
 		<select name="id_materia" class="ccformfield" >
+			<option value="" disabled selected hidden>Escolha a disciplina</option>
       		<%
-				for (var i = materia.length - 1; i >= 0; i--){%>
+				for (var i = 0; i < materia.length; i++){%>
 					<option value="<%=materia[i][0]%>"><%=materia[i][1]%></option>
 				<%}
 			%>
@@ -14,9 +25,10 @@
 	</div>
 
 	<div class="ccfield-prepend">
-		<select name="id_turma" class="ccformfield" >
+		<select name="id_turma" class="ccformfield">
+			<option value="" disabled selected hidden>Escolha a turma</option>
       		<%
-				for (var i = turma.length - 1; i >= 0; i--){%>
+				for (var i = 0; i < turma.length; i++){%>
 					<option value="<%=turma[i][0]%>"><%=turma[i][1]%></option>
 				<%}
 			%>
@@ -25,8 +37,8 @@
 
 	<div class="loading">
 		<% 
-			if(materia.length == 0 || turma.length == 0){%>
-				Não é possível concluir cadastro de professor sem antes cadastrar uma matéria e uma turma
+			if(materia == 0 || turma == 0 || professor == 0){%>
+				Não é possível concluir alocação de professor sem antes cadastrar uma matéria, uma turma e um professor
 			<%}
 			else{
 		%>
@@ -35,7 +47,20 @@
 			}
 		%>
 	</div>
-	<input type="hidden" name="tipo" value="professor">
+	<input type="hidden" name="tipo" value="turmaprof">
+</form>
+
+<h2>Cadastrar matéria</h2>
+<form id="frm_cadastro_materia" class="ccform">
+	<div class="ccfield-prepend">
+		<input class="ccformfield" type="text" name="nome" placeholder="Nome da disciplina" >
+	</div>
+
+	<input type="hidden" name="tipo" value="materia">
+
+	<div class="loading">
+		<input type="submit" class="ccbtn" value="Cadastrar">
+	</div>
 </form>
 
 <h2>Cadastrar turma</h2>
@@ -45,9 +70,14 @@
 	</div>
 
 	<div class="ccfield-prepend">
+		<input class="ccformfield" type="text" name="restricao" placeholder="Restrição (Ex: Reservado para alunos de CIC)" >
+	</div>
+
+	<div class="ccfield-prepend">
 		<select name="id_materia" class="ccformfield" >
+		<option value="" disabled selected hidden>Escolha a disciplina</option>
       		<%
-				for (var i = materia.length - 1; i >= 0; i--){%>
+				for (var i = 0; i < materia.length; i++){%>
 					<option value="<%=materia[i][0]%>"><%=materia[i][1]%></option>
 				<%}
 			%>
@@ -56,7 +86,7 @@
 
 	<div class="loading">
 		<% 
-			if(materia.length == 0 ){%>
+			if(materia == 0 ){%>
 				Não é possível concluir cadastro de turma sem antes cadastrar uma matéria
 			<%}
 			else{
@@ -70,14 +100,13 @@
 	<input type="hidden" name="tipo" value="turma">
 </form>
 
-<h2>Cadastrar matéria</h2>
-<form id="frm_cadastro_materia" class="ccform">
+<h2>Cadastrar professor</h2>
+<form id="frm_cadastro_professor" class="ccform">
 	<div class="ccfield-prepend">
-		<input class="ccformfield" type="text" name="nome" placeholder="Nome da disciplina" >
+		<input class="ccformfield" type="text" name="nome" placeholder="Nome do professor" >
 	</div>
-
-	<input type="hidden" name="tipo" value="materia">
-
+	
+	<input type="hidden" name="tipo" value="professor">
 	<div class="loading">
 		<input type="submit" class="ccbtn" value="Cadastrar">
 	</div>
@@ -125,6 +154,36 @@
 		});
 	}
 
+	function trocaTurmas(params){
+
+		var req = $.ajax({
+			url 		: '/menu/busca/turma',
+			type 		: 'POST',
+			data 		: {
+							params: params
+						}
+		});
+
+		req.done(function( turmas ){
+			var select = $('#frm_cadastro_turmaprof select[name=id_turma]');
+			select.empty();
+
+			if(turmas == 0){
+				$('#frm_cadastro_turmaprof .loading').text('Não é possível concluir cadastro de professor sem antes ter uma turma para esta matéria');
+			}
+			else{
+				$('#frm_cadastro_turmaprof .loading').html('<input type="submit" class="ccbtn" value="Cadastrar">');
+				$.each(turmas, function(i, turma){
+					select.append($("<option></option>").attr("value", turma[0]).text(turma[1]));
+				});
+			}
+		});
+
+		req.fail(function(jqXHR, textStatus){
+			console.log("Request failed: " + textStatus)
+		})
+	}
+
 	$("#frm_cadastro_professor").validate({
 		lang: 'pt-bt',
 		rules: {
@@ -146,6 +205,9 @@
 		lang: 'pt-bt',
 		rules: {
             nome: { 
+            	required: true
+            },
+            id_materia: { 
             	required: true
             }
         },
@@ -175,5 +237,32 @@
 			cadastro(params, "materia");
 		}
 	});
+
+	$("#frm_cadastro_turmaprof").validate({
+		lang: 'pt-bt',
+		rules: {
+            id_professor: { 
+            	required: true
+            },
+            id_materia: { 
+            	required: true
+            },
+            id_turma: { 
+            	required: true
+            }
+        },
+		submitHandler: function(form) {
+			$(".loading").html('<img src="img/loading.gif">');
+
+			var params = $(form).serializeObject();
+			$("#frm_redirect input[name=nome]").val("Professor alocado");
+
+			cadastro(params, "turmaprof");
+		}
+	});
+
+	$("#frm_cadastro_turmaprof select[name=id_materia]").change(function(){
+		trocaTurmas($(this).val());
+	})
 
 </script>

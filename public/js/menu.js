@@ -28,8 +28,6 @@ function getUrlParameter(sParam) {
 	sParameterName,
 	i;
 
-	console.log(sPageURL);
-
 	for (i = 0; i < sURLVariables.length; i++) {
 		sParameterName = sURLVariables[i].split('=');
 
@@ -41,18 +39,19 @@ function getUrlParameter(sParam) {
 	return false;
 }
 
-function capitalizeFirstLetter(string) {
-    return string.charAt(0).toUpperCase() + string.slice(1);
-}
 
 function menuSelected(menu){
 	$('.menuSelected').removeClass("menuSelected");
-	$('#menu ul li a:contains("' +capitalizeFirstLetter(menu) + '")').addClass("menuSelected");
+	$('#menu ul li a:contains("' +menu.capitalizeFirstLetter() + '")').addClass("menuSelected");
 }
 
 
 $('#menu ul li a').click(function(e){ 
 	var menu = ($(this).text()).toLowerCase();
+
+	if(menu == 'início'){
+		menu = 'inicio';
+	}
 	
 	menuSelected(menu);
 
@@ -73,7 +72,7 @@ if(pag != false){
 
 	switch(+status){
 		case 200:
-			html = '<div class="msg_status sucess">' + capitalizeFirstLetter(getUrlParameter('nome')).replace(/\+/g, ' ') + ' '+ msg + ' com sucesso</div>';
+			html = '<div class="msg_status sucess">' + getUrlParameter('nome').replace(/\+/g, ' ').capitalizeFirstLetter() + ' '+ msg + ' com sucesso</div>';
 		break;
 		case 406:
 			html = '<div class="msg_status erro">Operação cancelada</div>';
@@ -89,4 +88,5 @@ if(pag != false){
 }
 else{
 	menuSelected("início");
+	carregarMenu("inicio", "resultado");
 }

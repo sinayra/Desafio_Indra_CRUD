@@ -10,8 +10,9 @@ var self = module.exports = {
 
 	materia : require('./materia.js'),
 	turma : require('./turma.js'),
-/*	professor : require('./professor.js'),
-*/
+	professor : require('./professor.js'),
+	turmaprof : require('./turmaprof.js'),
+
 	iniciaBD : function(){
 
 		try{
@@ -33,8 +34,9 @@ var self = module.exports = {
 
 		self.materia.inicia(db);
 		self.turma.inicia(db);
-	/*	self.professor.inicia(db);
-	*/
+		self.professor.inicia(db);
+		self.turmaprof.inicia(db);
+	
 	},
 
 	getPort : function(){
@@ -48,14 +50,14 @@ var self = module.exports = {
 	},
 
 	selectTudo : function (table, order){
-		var t = db.exec('SELECT * FROM ' + table + ' ORDER BY ' + order + ' DESC');
+		var t = db.exec('SELECT * FROM ' + table + ' ORDER BY ' + order + ' ASC');
 		var val = [];
 
 		t.forEach(function(item){
 			val.push(item.values);
 		});
 
-		return val[0];
+		return (!utils.isEmpty(val[0]) ? val[0] : 0);
 	},
 
 	encerraBD : function(){

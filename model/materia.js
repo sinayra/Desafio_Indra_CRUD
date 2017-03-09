@@ -1,4 +1,5 @@
 var db;
+const utils = require('../public/js/utils.js');
 
 var self = module.exports = {
 
@@ -27,5 +28,29 @@ var self = module.exports = {
 		sqlstr.getAsObject({':aval' : id});
 
 		db.run(sqlstr);
+	},
+
+	buscaMateriaInfo : function(id){
+		var t = db.exec(
+			"SELECT 	t.nome AS 'nome_turma'," +
+			"			t.restricao, " +
+			"			CASE WHEN GROUP_CONCAT(p.nome) IS NULL THEN 'A designar' ELSE GROUP_CONCAT(p.nome) END AS 'nome_professores' " +
+			"FROM	turma AS t " + 
+			"LEFT JOIN turmaprof AS tp " +
+			"ON		t.id = tp.id_turma " +
+			"LEFT JOIN professor AS p " +
+			"ON		tp.id_professor = p.id " +
+			"WHERE 	t.id_materia = " + id + " " +
+			"GROUP BY t.id "
+		);
+		var val = [];
+
+		t.forEach(function(item){
+			val.push(item.values);
+		});
+
+		console.log(val[0]);
+
+		return (!utils.isEmpty(val[0]) ? val[0] : 0);
 	}
 };

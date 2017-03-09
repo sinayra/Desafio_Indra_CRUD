@@ -1,0 +1,74 @@
+<h2>Disciplinas</h2>
+<table id="disciplinas" class="display">
+    <thead>
+            <tr>
+                <th>Nome</th>
+            </tr>
+        </thead>
+        <tfoot>
+            <tr>
+                <th>Nome</th>
+            </tr>
+        </tfoot>
+        <tbody>
+            <%
+                for (var i = 0; i < materia.length; i++) {
+                    %>
+                    <tr>
+                        <td><a href="#" data-id="<%=materia[i][0]%>"><%=materia[i][1]%> <i class="fa fa-plus-square-o" aria-hidden="true"></i></td>
+                    </tr>
+                    <%
+                }
+            %>
+        </tbody>
+</table>
+
+
+<script type="text/javascript">
+    var tabela = $('#disciplinas').DataTable({
+         "language": {
+            "url": "/js/dataTables.Portuguese-Brasil.json"
+        }
+    });
+
+    function exibeInfoDisciplina ( id, row ) {
+
+        var req = $.ajax({
+            url         : 'menu/ler/busca_materia',
+            type        : 'POST',
+            data        : {
+                            id: id
+                        }
+        });
+
+        req.done(function( data ) {
+          row.child(data);        
+        });
+    }
+
+    $('#disciplinas a').click(function(e){
+        var id = $(this).attr('data-id');
+        var icon = $(this).children('i');
+
+        var tr = $(this).closest('tr');
+        var row = tabela.row( tr );
+ 
+        if ( row.child.isShown() ) {
+            // This row is already open - close it
+            row.child('').hide();
+            tr.removeClass('maisInfo');
+            $(icon).removeClass('fa-minus-square-o');
+            $(icon).addClass('fa-plus-square-o');
+        }
+        else {
+            // Open this row
+            row.child( '<img src="img/loading.gif">' ).show();
+            exibeInfoDisciplina(id, row);
+            tr.addClass('maisInfo');
+            $(icon).removeClass('fa-plus-square-o');
+            $(icon).addClass('fa-minus-square-o');
+        }
+
+        e.preventDefault();
+    });
+</script>

@@ -1,0 +1,173 @@
+<h2>Disciplinas</h2>
+<table id="materia" class="display">
+    <thead>
+            <tr>
+                <th></th>
+                <th>Nome</th>
+            </tr>
+        </thead>
+        <tfoot>
+            <tr>
+                <th></th>
+                <th>Nome</th>
+            </tr>
+        </tfoot>
+        <tbody>
+            <%
+                for (var i = 0; i < materia.length; i++) {
+                    %>
+                    <tr>
+                        <td><input type="button" data-id="<%=materia[i][0]%>" class="ccbtn" value="Atualizar"></td>
+                        <td><input type="text" name="nome" value="<%=materia[i][1]%>"></td>
+                    </tr>
+                    <%
+                }
+            %>
+        </tbody>
+</table>
+
+<h2>Turmas</h2>
+<table id="turma" class="display">
+    <thead>
+            <tr>
+                <th></th>
+                <th>Disciplina</th>
+                <th>Turma</th>
+                <th>Restrição</th>
+            </tr>
+        </thead>
+        <tfoot>
+            <tr>
+                <th></th>
+                <th>Disciplina</th>
+                <th>Turma</th>
+                <th>Restrição</th>
+            </tr>
+        </tfoot>
+        <tbody>
+            <%
+                for (var i = 0; i < turma.length; i++) {
+                    %>
+                    <tr>
+                        <td><input type="button" data-id="<%=turma[i][0]%>" class="ccbtn" value="Atualizar"></td>
+                        <td><%=turma[i][2]%></td>
+                        <td><input type="text" name="nome" value="<%=turma[i][1]%>"></td>
+                        <td><input type="text" name="restricao" value="<%=turma[i][3]%>"></td>
+                    </tr>
+                    <%
+                }
+            %>
+        </tbody>
+</table>
+
+<h2>Professores</h2>
+<table id="professor" class="display">
+    <thead>
+            <tr>
+                <th></th>
+                <th>Nome</th>
+            </tr>
+        </thead>
+        <tfoot>
+            <tr>
+                <th></th>
+                <th>Nome</th>
+            </tr>
+        </tfoot>
+        <tbody>
+            <%
+                for (var i = 0; i < professor.length; i++) {
+                    %>
+                    <tr>
+                        <td><input type="button" data-id="<%=professor[i][0]%>" class="ccbtn" value="Atualizar"></td>
+                        <td><input type="text" name="nome" value="<%=professor[i][1]%>"></td>
+                    </tr>
+                    <%
+                }
+            %>
+        </tbody>
+</table>
+
+<form id="frm_redirect" action="/">
+    <input type="hidden" name="pag" value="atualizar">
+    <input type="hidden" name="acao" value="atualizado(a)">
+    <input type="hidden" name="msg" value="0">
+    <input type="hidden" name="status" value="0">
+    <input type="hidden" name="textStatus" value="0">
+    <input type="hidden" name="nome" value="0">
+</form>
+
+<script type="text/javascript">
+    $('#materia,#turma,#professor').DataTable({
+         "language": {
+            "url": "/js/dataTables.Portuguese-Brasil.json"
+        },
+        "columnDefs": [ {
+            "targets": 0,
+            "orderable": false
+        } ]
+    });
+
+    function atualiza(params, tipo){
+        var req = $.ajax({
+            url         : 'menu/atualiza/' + tipo,
+            type        : 'POST',
+            data        : {
+                            params: params
+                        },
+            beforeSend: function(){
+                $("#loading").html('<img src="img/loading.gif">');
+            }
+        });
+
+        req.always(function(a, textStatus, c ){
+            var status, msg = '';
+
+            if(textStatus == 'success'){
+                status = c.status; //jqXHR.always(function( data, textStatus, jqXHR ) { });
+                msg = textStatus;
+            }
+            else{
+                status = a.status; //jqXHR.always(function( jqXHR, textStatus, errorThrown ) { });
+                msg = c;
+            }
+
+            $("#frm_redirect input[name=status]").val(status);
+            $("#frm_redirect input[name=textStatus]").val(msg);
+
+
+            $( "#frm_redirect" ).submit();
+        });
+    }
+
+    $(document).on("click","#materia input[type=button], #professor input[type=button]",function(e){
+        var tipo = $(this).closest('table').attr('id');
+
+        $("#frm_redirect input[name=msg]").val("foi atualizado(a)");
+
+        var param = {
+            "id" : $(this).attr('data-id'),
+            "nome" : $(this).closest('tr').find('input[name=nome]').val()
+        };
+
+        $("#frm_redirect input[name=nome]").val(tipo.capitalizeFirstLetter() + param.nome);
+
+        atualiza(param, tipo);
+    });
+
+    $(document).on("click","#turma input[type=button]",function(e){
+        var tipo = $(this).closest('table').attr('id');
+
+        $("#frm_redirect input[name=msg]").val("foi atualizada");
+
+        var param = {
+            "id" : $(this).attr('data-id'),
+            "nome" : $(this).closest('tr').find('input[name=nome]').val(),
+            "restricao" : $(this).closest('tr').find('input[name=restricao]').val()
+        };
+
+        $("#frm_redirect input[name=nome]").val('Turma ' + param.nome);
+
+        atualiza(param, tipo);
+    });
+</script>
