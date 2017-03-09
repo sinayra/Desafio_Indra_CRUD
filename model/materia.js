@@ -1,5 +1,6 @@
 var db;
 const utils = require('../public/js/utils.js');
+const db_turma = require('./turma.js');
 
 var self = module.exports = {
 
@@ -28,6 +29,8 @@ var self = module.exports = {
 		sqlstr.getAsObject({':aval' : id});
 
 		db.run(sqlstr);
+
+		db_turma.delete('id_materia', id);
 	},
 
 	buscaMateriaInfo : function(id){
@@ -48,8 +51,6 @@ var self = module.exports = {
 		t.forEach(function(item){
 			val.push(item.values);
 		});
-
-		console.log(val[0]);
 
 		return (!utils.isEmpty(val[0]) ? val[0] : 0);
 	}

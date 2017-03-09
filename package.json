@@ -7,7 +7,7 @@
     "package-all": "electron-packager ./ Indra_CRUD --all --out builds --version 1.0.0 --overwrite --asar=true",
     "package": "electron-packager ./ Indra_CRUD --out builds --version 1.0.0 --overwrite --asar=true"
   },
-  "repository": "https://bitbucket.org/sinayra/jmcarros",
+  "repository": "https://github.com/sinayra/Desafio_Indra_CRUD",
   "author": "Sinayra Pascoal Cotts Moreira",
   "devDependencies": {
     "browser-resolve": "^1.11.2",

@@ -1,0 +1,232 @@
+<h2>Alocação de Professores</h2>
+<table id="turmaprof" class="display">
+    <thead>
+            <tr>
+                <th></th>
+                <th>Nome do professor</th>
+                <th>Disciplina</th>
+                <th>Turma</th>
+            </tr>
+        </thead>
+        <tfoot>
+            <tr>
+                <th></th>
+                <th>Nome do professor</th>
+                <th>Disciplina</th>
+                <th>Turma</th>
+            </tr>
+        </tfoot>
+        <tbody>
+            <%
+                for (var i = 0; i < turmaprof.length; i++) {
+                    %>
+                    <tr>
+                        <td><input type="button" data-id="<%=turmaprof[i][0]%>" class="ccbtn" value="Excluir"></td>
+                        
+                        <td>
+                            <%
+                                for (var j = 0; j < professor.length; j++){
+                                        var select = '';
+                                        if(turmaprof[i][1] == professor[j][0]){
+                                            %>
+                                                <%=professor[j][1]%>
+                                            <%
+                                            break;
+                                        }
+                                        %>
+                                <%}
+                            %>
+                        </td>
+                        <td>
+                            <%
+                                for (var j = 0; j < materia.length; j++){
+                                        var select = '';
+                                        if(turmaprof[i][3] == materia[j][0]){
+                                            %>
+                                                <%=materia[j][1]%>
+                                            <%
+                                            break;
+                                        }
+                                        %>
+                                <%}
+                            %>
+                        </td>
+                        <td>
+                            <%
+                                for (var j = 0; j < turma.length; j++){
+                                        var select = '';
+                                        if(turmaprof[i][2] == turma[j][0]){
+                                            %>
+                                                <%=turma[j][1]%>
+                                            <%
+                                            break;
+                                        }
+                                        %>
+                                <%}
+                            %>
+                        </td>
+                    </tr>
+                    <%
+                }
+            %>
+        </tbody>
+</table>
+
+<h2>Disciplinas</h2>
+<table id="materia" class="display">
+    <thead>
+            <tr>
+                <th></th>
+                <th>Nome</th>
+            </tr>
+        </thead>
+        <tfoot>
+            <tr>
+                <th></th>
+                <th>Nome</th>
+            </tr>
+        </tfoot>
+        <tbody>
+            <%
+                for (var i = 0; i < materia.length; i++) {
+                    %>
+                    <tr>
+                        <td><input type="button" data-id="<%=materia[i][0]%>" class="ccbtn" value="Excluir"></td>
+                        <td><%=materia[i][1]%></td>
+                    </tr>
+                    <%
+                }
+            %>
+        </tbody>
+</table>
+
+<h2>Turmas</h2>
+<table id="turma" class="display">
+    <thead>
+            <tr>
+                <th></th>
+                <th>Disciplina</th>
+                <th>Turma</th>
+                <th>Restrição</th>
+            </tr>
+        </thead>
+        <tfoot>
+            <tr>
+                <th></th>
+                <th>Disciplina</th>
+                <th>Turma</th>
+                <th>Restrição</th>
+            </tr>
+        </tfoot>
+        <tbody>
+            <%
+                for (var i = 0; i < turma.length; i++) {
+                    %>
+                    <tr>
+                        <td><input type="button" data-id="<%=turma[i][0]%>" class="ccbtn" value="Excluir"></td>
+                        <td><%=turma[i][2]%></td>
+                        <td><%=turma[i][1]%></td>
+                        <td><%=turma[i][3]%></td>
+                    </tr>
+                    <%
+                }
+            %>
+        </tbody>
+</table>
+
+<h2>Professores</h2>
+<table id="professor" class="display">
+    <thead>
+            <tr>
+                <th></th>
+                <th>Nome</th>
+            </tr>
+        </thead>
+        <tfoot>
+            <tr>
+                <th></th>
+                <th>Nome</th>
+            </tr>
+        </tfoot>
+        <tbody>
+            <%
+                for (var i = 0; i < professor.length; i++) {
+                    %>
+                    <tr>
+                        <td><input type="button" data-id="<%=professor[i][0]%>" class="ccbtn" value="Excluir"></td>
+                        <td><%=professor[i][1]%></td>
+                    </tr>
+                    <%
+                }
+            %>
+        </tbody>
+</table>
+
+<form id="frm_redirect" action="/">
+    <input type="hidden" name="pag" value="remover">
+    <input type="hidden" name="acao" value="removido(a)">
+    <input type="hidden" name="msg" value="0">
+    <input type="hidden" name="status" value="0">
+    <input type="hidden" name="textStatus" value="0">
+    <input type="hidden" name="nome" value="0">
+</form>
+
+<script type="text/javascript">
+    $('#materia,#turma,#professor,#turmaprof').DataTable({
+         "language": {
+            "url": "/js/dataTables.Portuguese-Brasil.json"
+        },
+         "order": [[ 1, "asc" ]],
+        "columnDefs": [ {
+            "targets": 0,
+            "orderable": false
+        } ]
+    });
+
+    function remove(params, tipo){
+        var req = $.ajax({
+            url         : 'menu/remove/' + tipo,
+            type        : 'POST',
+            data        : {
+                            params: params
+                        },
+            beforeSend: function(){
+                $("#loading").html('<img src="img/loading.gif">');
+            }
+        });
+
+        req.always(function(a, textStatus, c ){
+            var status, msg = '';
+
+            if(textStatus == 'success'){
+                status = c.status; //jqXHR.always(function( data, textStatus, jqXHR ) { });
+                msg = textStatus;
+            }
+            else{
+                status = a.status; //jqXHR.always(function( jqXHR, textStatus, errorThrown ) { });
+                msg = c;
+            }
+
+            $("#frm_redirect input[name=status]").val(status);
+            $("#frm_redirect input[name=textStatus]").val(msg);
+
+
+            $( "#frm_redirect" ).submit();
+        });
+    }
+
+    $(document).on("click","#materia input[type=button], #professor input[type=button], #turma input[type=button], #turmaprof input[type=button]",function(e){
+        var tipo = $(this).closest('table').attr('id');
+
+        $("#frm_redirect input[name=msg]").val("foi excluído");
+
+        var param = {
+            "id" : $(this).attr('data-id')
+        };
+
+        $("#frm_redirect input[name=nome]").val("Registro");
+
+        remove(param, tipo);
+    });
+
+</script>

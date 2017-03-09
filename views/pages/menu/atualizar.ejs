@@ -1,3 +1,88 @@
+<h2>Alocação de professores</h2>
+
+<table id="turmaprof" class="display">
+    <thead>
+            <tr>
+                <th></th>
+                <th>Nome do professor</th>
+                <th>Disciplina</th>
+                <th>Turma</th>
+            </tr>
+        </thead>
+        <tfoot>
+            <tr>
+                <th></th>
+                <th>Nome do professor</th>
+                <th>Disciplina</th>
+                <th>Turma</th>
+            </tr>
+        </tfoot>
+        <tbody>
+            <%
+                for (var i = 0; i < turmaprof.length; i++) {
+                    %>
+                    <tr>
+                        <td>
+                            <span id="<%=turmaprof[i][0]%>">
+                            <% 
+                                if(materia == 0 || turma == 0 || professor == 0){%>
+                                    Não é possível atualizar alocação de professor sem antes cadastrar uma matéria, uma turma e um professor
+                                <%}
+                                else{
+                            %>
+                                    <input type="button" class="ccbtn" value="Atualizar">
+                            <%
+                                }
+                            %>
+                            </span>
+                        </td>
+                        <td>
+                            <select name="id_professor" class="ccformfield" >
+                                <%
+                                    for (var j = 0; j < professor.length; j++){
+                                            var select = '';
+                                            if(turmaprof[i][1] == professor[j][0]){
+                                                select = 'selected';
+                                            }
+                                            %>
+                                        <option value="<%=professor[j][0]%>" <%=select%> ><%=professor[j][1]%></option>
+                                    <%}
+                                %>
+                            </select>
+                        </td>
+                        <td>
+                            <select name="id_materia" class="ccformfield" >
+                                <%
+                                    for (var j = 0; j < materia.length; j++){
+                                            var select = '';
+                                            if(turmaprof[i][3] == materia[j][0]){
+                                                select = 'selected';
+                                            }%>
+                                        <option value="<%=materia[j][0]%>" <%=select%>><%=materia[j][1]%></option>
+                                    <%}
+                                %>
+                            </select>
+                        </td>
+                        <td>
+                            <select name="id_turma" class="ccformfield" >
+                                <%
+                                    for (var j = 0; j < turmaprof[i].turma.length; j++){
+                                            var select = '';
+                                            if(turmaprof[i][2] == turmaprof[i].turma[j][0]){
+                                                select = 'selected';
+                                            }%>
+                                        <option value="<%=turmaprof[i].turma[j][0]%>" <%=select%>><%=turmaprof[i].turma[j][1]%></option>
+                                    <%}
+                                %>
+                            </select>
+                        </td>
+                    </tr>
+                    <%
+                }
+            %>
+        </tbody>
+</table>
+
 <h2>Disciplinas</h2>
 <table id="materia" class="display">
     <thead>
@@ -50,7 +135,21 @@
                     %>
                     <tr>
                         <td><input type="button" data-id="<%=turma[i][0]%>" class="ccbtn" value="Atualizar"></td>
-                        <td><%=turma[i][2]%></td>
+                        <td>
+                            <select name="id_materia">
+                                <% 
+                                    for(var j = 0; j < materia.length; j++){
+                                        var select = '';
+                                        if(turma[i][4] == materia[j][0]){
+                                            select = 'selected';
+                                        }%>
+                                            <option value="<%=materia[j][0]%>" <%=select%> ><%=materia[j][1]%></option>
+                                        <%
+                                    }
+                                %>
+
+                            </select>
+                        </td>
                         <td><input type="text" name="nome" value="<%=turma[i][1]%>"></td>
                         <td><input type="text" name="restricao" value="<%=turma[i][3]%>"></td>
                     </tr>
@@ -98,15 +197,48 @@
 </form>
 
 <script type="text/javascript">
-    $('#materia,#turma,#professor').DataTable({
+    $('#materia, #turma, #professor, #turmaprof').DataTable({
          "language": {
             "url": "/js/dataTables.Portuguese-Brasil.json"
         },
+         "order": [[ 1, "asc" ]],
+        "searching": false,
+        "ordering": false,
         "columnDefs": [ {
             "targets": 0,
             "orderable": false
         } ]
     });
+
+    function trocaTurmasUpdate(params, btn){
+
+        var req = $.ajax({
+            url         : '/menu/busca/turma',
+            type        : 'POST',
+            data        : {
+                            params: params
+                        }
+        });
+
+        req.done(function( turmas ){
+            var select = btn.closest('tr').find('select[name=id_turma]');
+            select.empty();
+
+            if(turmas == 0){
+                btn.text('Não é possível alterar alocação de professor sem antes ter uma turma para esta matéria');
+            }
+            else{
+                btn.html('<input type="button" class="ccbtn" value="Atualizar">');
+                $.each(turmas, function(i, turma){
+                    select.append($("<option></option>").attr("value", turma[0]).text(turma[1]));
+                });
+            }
+        });
+
+        req.fail(function(jqXHR, textStatus){
+            console.log("Request failed: " + textStatus)
+        })
+    }
 
     function atualiza(params, tipo){
         var req = $.ajax({
@@ -163,11 +295,33 @@
         var param = {
             "id" : $(this).attr('data-id'),
             "nome" : $(this).closest('tr').find('input[name=nome]').val(),
-            "restricao" : $(this).closest('tr').find('input[name=restricao]').val()
+            "restricao" : $(this).closest('tr').find('input[name=restricao]').val(),
+            "id_materia" : $(this).closest('tr').find('select[name=id_materia]').val(),
         };
 
         $("#frm_redirect input[name=nome]").val('Turma ' + param.nome);
 
         atualiza(param, tipo);
+    });
+
+    $(document).on("click","#turmaprof input[type=button]",function(e){
+        var tipo = $(this).closest('table').attr('id');
+
+        $("#frm_redirect input[name=msg]").val("foi atualizada");
+
+        var param = {
+            "id" : $(this).closest('span').attr('id'),
+            "id_professor" : $(this).closest('tr').find('select[name=id_professor]').val(),
+            "id_turma" : $(this).closest('tr').find('select[name=id_turma]').val(),
+        };
+
+        $("#frm_redirect input[name=nome]").val('Alocação');
+
+        atualiza(param, tipo);
+    });
+
+    $("#turmaprof select[name=id_materia]").change(function(){
+        var btn = $(this).closest('tr').find('span');
+        trocaTurmasUpdate($(this).val(), btn);
     });
 </script>

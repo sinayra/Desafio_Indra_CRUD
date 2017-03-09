@@ -1,5 +1,6 @@
 var db;
 const utils = require('../public/js/utils.js');
+const db_turmaprof = require('./turmaprof.js');
 
 var self = module.exports = {
 
@@ -17,7 +18,6 @@ var self = module.exports = {
 	update : function(turma){
 		var sqlstr;
 
-
 		sqlstr = db.prepare('UPDATE turma SET nome = "'+ turma.nome + '", id_materia = '+ turma.id_materia+ ', restricao = "'+ turma.restricao + '" WHERE id=:aval');
 		sqlstr.getAsObject({':aval' : turma.id});
 	},
@@ -29,6 +29,8 @@ var self = module.exports = {
 		sqlstr.getAsObject({':aval' : id});
 
 		db.run(sqlstr);
+
+		db_turmaprof.delete('id_turma', id);
 	},
 
 	buscaNomeTurmas : function(id_materia){

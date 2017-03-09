@@ -66,10 +66,27 @@ var self = module.exports = {
 			var parametros = {
 				materia: db.selectTudo("materia", "nome"),
 				turma: db.turma.selectTurmas(),
-				professor: db.selectTudo("professor", "nome")
+				professor: db.selectTudo("professor", "nome"),
+				turmaprof: db.turmaprof.selectTurmasProf()
 			};
 
+			for(var i = 0; i < parametros.turmaprof.length; i++){
+				parametros.turmaprof[i].turma = db.turma.buscaNomeTurmas(parametros.turmaprof[i][3]);
+			}
+
 			res.render("pages/menu/atualizar", parametros);
+		});
+
+		view.get('/menu/remover', function (req, res) {
+
+			var parametros = {
+				materia: db.selectTudo("materia", "nome"),
+				turma: db.turma.selectTurmas(),
+				professor: db.selectTudo("professor", "nome"),
+				turmaprof: db.turmaprof.selectTurmasProf()
+			};
+
+			res.render("pages/menu/remover", parametros);
 		});
 	},
 
@@ -83,6 +100,12 @@ var self = module.exports = {
 		view.post('/menu/atualiza/materia', function (req, res) {
 
 			db.materia.update(req.body.params);
+			res.sendStatus(200);
+		});
+
+		view.post('/menu/remove/materia', function (req, res) {
+
+			db.materia.delete('id', req.body.params.id);
 			res.sendStatus(200);
 		});
 
@@ -109,6 +132,12 @@ var self = module.exports = {
 			res.sendStatus(200);
 		});
 
+		view.post('/menu/remove/turma', function (req, res) {
+
+			db.turma.delete('id', req.body.params.id);
+			res.sendStatus(200);
+		});
+
 		view.post('/menu/busca/turma', function (req, res) {
 
 			var turma = db.turma.buscaNomeTurmas(req.body.params);
@@ -123,6 +152,12 @@ var self = module.exports = {
 			res.sendStatus(200);
 		});
 
+		view.post('/menu/remove/professor', function (req, res) {
+
+			db.professor.delete('id', req.body.params.id);
+			res.sendStatus(200);
+		});
+
 		view.post('/menu/atualiza/professor', function (req, res) {
 
 			db.professor.update(req.body.params);
@@ -134,6 +169,18 @@ var self = module.exports = {
 		view.post('/menu/cadastro/turmaprof', function (req, res) {
 
 			db.turmaprof.insere(req.body.params);
+			res.sendStatus(200);
+		});
+
+		view.post('/menu/atualiza/turmaprof', function (req, res) {
+
+			db.turmaprof.update(req.body.params);
+			res.sendStatus(200);
+		});
+
+		view.post('/menu/remove/turmaprof', function (req, res) {
+
+			db.turmaprof.delete('id', req.body.params.id);
 			res.sendStatus(200);
 		});
 	}

@@ -4,7 +4,7 @@
 
 	<div class="ccfield-prepend">
 		<select name="id_professor" class="ccformfield" >
-		<option value="" disabled selected hidden>Escolha o professor</option>
+			<option value="" disabled selected hidden>Escolha o professor</option>
       		<%
 				for (var i = 0; i < professor.length; i++){%>
 					<option value="<%=professor[i][0]%>"><%=professor[i][1]%></option>
@@ -154,7 +154,7 @@
 		});
 	}
 
-	function trocaTurmas(params){
+	function trocaTurmasCadastro(params){
 
 		var req = $.ajax({
 			url 		: '/menu/busca/turma',
@@ -262,7 +262,7 @@
 	});
 
 	$("#frm_cadastro_turmaprof select[name=id_materia]").change(function(){
-		trocaTurmas($(this).val());
-	})
+		trocaTurmasCadastro($(this).val());
+	});
 
 </script>

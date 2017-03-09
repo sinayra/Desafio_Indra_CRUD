@@ -1,5 +1,7 @@
 var db;
 
+const db_turmaprof = require('./turmaprof.js');
+
 var self = module.exports = {
 
 	inicia : function(database){
@@ -27,5 +29,7 @@ var self = module.exports = {
 		sqlstr.getAsObject({':aval' : id});
 
 		db.run(sqlstr);
+
+		db_turmaprof.delete('id_professor', id);
 	}
 };
